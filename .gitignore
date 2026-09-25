@@ -56,3 +56,6 @@ Thumbs.db
 # Synthesised clips and run results are regenerable.
 evals/.cache/
 evals/results/
+
+.vercel
+.env*
