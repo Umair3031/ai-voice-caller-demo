@@ -1,0 +1,90 @@
+# ==============================================================================
+# NovaConnect Telecoms Conversational IVR — Render blueprint
+# ------------------------------------------------------------------------------
+# Provisions:
+#   1. novaconnect-ivr-redis  — shared state (sessions, telemetry, CRM, rate limits)
+#   2. novaconnect-ivr-api    — the FastAPI voice pipeline (Docker, see Dockerfile)
+#
+# Connect this repo in the Render dashboard ("New +" -> "Blueprint"). Vars marked
+# `sync: false` must be filled in manually after the first deploy — they are
+# secrets and are never committed.
+#
+# The Next.js frontend deploys separately; point its NEXT_PUBLIC_API_BASE_URL at
+# this API's public URL, and add that frontend's origin to CORS_ALLOW_ORIGINS
+# below.
+# ==============================================================================
+
+services:
+  # ---------------------------------------------------------------------------
+  # Shared state. Without this the engine is limited to a single worker, loses
+  # every session and all telemetry on restart, and cannot scale horizontally.
+  # ---------------------------------------------------------------------------
+  - type: redis
+    name: novaconnect-ivr-redis
+    plan: starter
+    # Only this blueprint's own services may connect.
+    ipAllowList: []
+    maxmemoryPolicy: noeviction
+
+  # ---------------------------------------------------------------------------
+  # Voice pipeline engine
+  # ---------------------------------------------------------------------------
+  - type: web
+    name: novaconnect-ivr-api
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: starter
+    # Readiness, not liveness: this verifies Redis responds and persona
+    # templates render, so a container with a dead dependency is never given
+    # traffic. The previous blueprint pointed at a check that returned "ok"
+    # unconditionally, which reported a container with an expired API key as
+    # healthy while every call it accepted failed.
+    healthCheckPath: /api/v1/readyz
+    autoDeploy: true
+    envVars:
+      # -- Secrets (set in the dashboard) -----------------------------------
+      - key: SARVAM_API_KEY
+        sync: false
+      # Comma-separated keys for operator endpoints (CRM, telemetry, session
+      # transcripts). Leave unset and those endpoints stay closed.
+      - key: OPERATOR_API_KEYS
+        sync: false
+
+      # -- Shared state ------------------------------------------------------
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: novaconnect-ivr-redis
+          property: connectionString
+
+      # -- Frontend origin (explicit; '*' is rejected) -----------------------
+      - key: CORS_ALLOW_ORIGINS
+        sync: false
+
+      # -- Models ------------------------------------------------------------
+      - key: SARVAM_TEXT_MODEL
+        value: sarvam-105b-conversations
+      - key: STT_MODEL
+        value: "saaras:v3"
+      - key: TTS_MODEL
+        value: "bulbul:v3"
+      # Must be a voice the TTS model accepts; app/core/config.py validates
+      # this at boot rather than letting every call 400 and degrade to text.
+      - key: TTS_SPEAKER
+        value: priya
+      - key: TTS_FOLLOW_DETECTED_LANGUAGE
+        value: "true"
+
+      # -- Runtime -----------------------------------------------------------
+      - key: APP_ENV
+        value: production
+      - key: LOG_LEVEL
+        value: INFO
+      - key: LOG_FORMAT
+        value: json
+      - key: PORT
+        value: "8000"
+      # Safe only because REDIS_URL is wired above; app.main refuses to boot
+      # with >1 worker and no shared state backend.
+      - key: WEB_CONCURRENCY
+        value: "2"

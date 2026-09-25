@@ -1,0 +1,83 @@
+{
+  "_comment": "Client services catalog (source: ClientServices.json, provided 2026-09-19). Rendered into Jessika's prompt by app/domain/personas/registry.py:_render_service_catalog. Update this file, not the prompt.",
+  "company_name": "NovaConnect Telecoms",
+  "currency": "INR",
+  "tax_disclaimer": "Prices are exclusive of 18% GST",
+  "services": [
+    {
+      "id": "ftth_broadband",
+      "name": "Veloce UltraFiber",
+      "category": "Fixed Line Broadband",
+      "serviceable_regions": ["Bengaluru", "Mumbai", "Delhi NCR", "Hyderabad"],
+      "plans": [
+        {
+          "plan_name": "Fiber Basic",
+          "speed": "40 Mbps",
+          "price_per_30_days": 499,
+          "data_limit": "Unlimited (3.3TB FUP limit)",
+          "benefits": [
+            "Symmetrical download/upload speeds",
+            "Free standard installation on 3/6-month advance bookings"
+          ]
+        },
+        {
+          "plan_name": "Fiber Value",
+          "speed": "100 Mbps",
+          "price_per_30_days": 799,
+          "data_limit": "Unlimited (3.3TB FUP limit)",
+          "benefits": [
+            "Optimized for remote work and HD streaming",
+            "Free voice calling via landline routing"
+          ]
+        },
+        {
+          "plan_name": "Fiber Premium",
+          "speed": "300 Mbps",
+          "price_per_30_days": 1499,
+          "data_limit": "Unlimited (3.3TB FUP limit)",
+          "benefits": [
+            "Optimized for 4K streaming and pro gaming",
+            "Includes basic OTT bundle subscription"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "mobile_sim",
+      "name": "Veloce Mobile Identity",
+      "category": "Mobile Services (MVNO)",
+      "serviceable_regions": ["Pan-India (all 22 telecom circles)"],
+      "features": [
+        "Custom number vanity store",
+        "Clean, inter-circle seamless roaming",
+        "Instant eSIM generation via digital KYC"
+      ],
+      "plans": [
+        {
+          "plan_type": "Prepaid Monthly",
+          "price": 299,
+          "validity_days": 28,
+          "data": "1.5GB/day",
+          "voice": "Unlimited Local & National Roaming",
+          "sms": "100 SMS/day"
+        },
+        {
+          "plan_type": "Prepaid Quarterly",
+          "price": 799,
+          "validity_days": 84,
+          "data": "2GB/day",
+          "voice": "Unlimited Local & National Roaming",
+          "sms": "100 SMS/day"
+        },
+        {
+          "plan_type": "Prepaid Annual Value",
+          "price": 2999,
+          "validity_days": 365,
+          "data": "2.5GB/day",
+          "voice": "Unlimited Local & National Roaming",
+          "sms": "100 SMS/day"
+        }
+      ]
+    }
+  ]
+}

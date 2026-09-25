@@ -1,0 +1,27 @@
+{"id": "short-yes", "text": "Yes.", "tags": ["short"], "terms": []}
+{"id": "short-no", "text": "No, not yet.", "tags": ["short"], "terms": []}
+{"id": "short-ok", "text": "Okay, go ahead.", "tags": ["short"], "terms": []}
+{"id": "short-hello", "text": "Hello, can you hear me?", "tags": ["short"], "terms": []}
+{"id": "short-thanks", "text": "Thank you, that helps.", "tags": ["short"], "terms": []}
+{"id": "out-1", "text": "My internet is not working since this morning.", "tags": ["sentence"], "terms": []}
+{"id": "out-2", "text": "The light on my router is blinking red.", "tags": ["sentence"], "terms": ["router"]}
+{"id": "out-3", "text": "I restarted the router twice but nothing changed.", "tags": ["sentence"], "terms": ["router"]}
+{"id": "out-4", "text": "The L O S light is red and the internet is completely down.", "tags": ["sentence", "terms"], "terms": ["LOS"]}
+{"id": "slow-1", "text": "My speed is really slow in the evenings, it is barely ten megabits.", "tags": ["sentence"], "terms": []}
+{"id": "bill-1", "text": "Why does my account show a balance due?", "tags": ["sentence"], "terms": []}
+{"id": "bill-2", "text": "I already paid the bill last Friday through the app.", "tags": ["sentence"], "terms": []}
+{"id": "bill-3", "text": "Can you waive the late fee this once? I will pay today.", "tags": ["sentence"], "terms": []}
+{"id": "bill-4", "text": "My plan costs seven hundred ninety nine rupees plus G S T.", "tags": ["sentence", "price", "terms"], "terms": ["GST"]}
+{"id": "dig-pin", "text": "My PIN code is five six zero zero three four.", "tags": ["digits"], "terms": []}
+{"id": "dig-pin2", "text": "It is four zero zero zero five three.", "tags": ["digits"], "terms": []}
+{"id": "dig-phone", "text": "My number is nine eight one zero zero one two three four five.", "tags": ["digits"], "terms": []}
+{"id": "dig-acct", "text": "The account number is one zero zero two three four.", "tags": ["digits"], "terms": []}
+{"id": "dig-mixed", "text": "I live in Whitefield, Bengaluru, PIN five six six zero six six.", "tags": ["digits", "sentence"], "terms": []}
+{"id": "term-1", "text": "I want to know about the Veloce UltraFiber plans.", "tags": ["terms", "sentence"], "terms": ["Veloce", "UltraFiber"]}
+{"id": "term-2", "text": "Does the fiber plan come with a Wi-Fi 6 router?", "tags": ["terms", "sentence"], "terms": ["Wi-Fi 6", "router"]}
+{"id": "term-3", "text": "What happens when I cross the F U P limit?", "tags": ["terms", "sentence"], "terms": ["FUP"]}
+{"id": "term-4", "text": "Is D M K available in Hyderabad and Delhi N C R?", "tags": ["terms", "sentence"], "terms": ["NovaConnect", "Hyderabad"]}
+{"id": "term-5", "text": "I would like a vanity number for my new S I M card.", "tags": ["terms", "sentence"], "terms": ["vanity", "SIM"]}
+{"id": "long-1", "text": "I have been a customer for three years and this is the second time this month that my connection has dropped in the middle of a work call.", "tags": ["long"], "terms": []}
+{"id": "long-2", "text": "I am working from home with two laptops and a couple of phones, so I need something that stays fast when everyone is online at the same time.", "tags": ["long"], "terms": []}
+{"id": "long-3", "text": "The technician came last week and said it was fixed, but the red light came back yesterday and now I have no internet at all.", "tags": ["long"], "terms": []}

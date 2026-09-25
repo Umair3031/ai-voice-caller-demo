@@ -1,0 +1,58 @@
+# ==============================================================================
+# NovaConnect Telecoms Conversational IVR
+# ==============================================================================
+
+# --- Secrets: never leak API keys ---------------------------------------------
+.env
+.env.*
+!.env.example
+
+# --- Python -------------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# --- Virtual environments -----------------------------------------------------
+.venv/
+venv/
+env/
+
+# --- Node / Next.js frontend --------------------------------------------------
+node_modules/
+.next/
+out/
+.turbo/
+*.tsbuildinfo
+# Generated from the API's OpenAPI document — never hand-edited, never committed.
+**/lib/api/generated.ts
+
+# --- Generated call-audio artifacts -------------------------------------------
+# TTS output is streamed in memory and never written to disk by the app; these
+# are ignored defensively for local debugging and test recordings.
+*.mp3
+*.wav
+
+# --- Legacy Streamlit config (superseded; see legacy/README.md) ---------------
+legacy/.streamlit/
+
+# --- OS / editor cruft --------------------------------------------------------
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# --- Local harness/tooling state (not part of the project) -------------------
+.claude/
+
+# --- Voice evaluation ----------------------------------------------------------
+# Synthesised clips and run results are regenerable.
+evals/.cache/
+evals/results/

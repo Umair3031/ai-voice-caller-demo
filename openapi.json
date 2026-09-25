@@ -1,0 +1,1852 @@
+{
+  "components": {
+    "schemas": {
+      "Body_open_call_api_v1_calls_open_post": {
+        "properties": {
+          "persona": {
+            "$ref": "#/components/schemas/PersonaId",
+            "default": "novaconnect_default",
+            "description": "Agent persona id."
+          }
+        },
+        "title": "Body_open_call_api_v1_calls_open_post",
+        "type": "object"
+      },
+      "Body_run_turn_api_v1_calls_turn_post": {
+        "properties": {
+          "audio": {
+            "anyOf": [
+              {
+                "format": "binary",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Caller audio clip (wav/mp3/m4a/ogg).",
+            "title": "Audio"
+          },
+          "persona": {
+            "$ref": "#/components/schemas/PersonaId",
+            "default": "novaconnect_default",
+            "description": "Agent persona id."
+          },
+          "phone_number": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Caller MSISDN as returned by /calls/open. Omit for a prospect.",
+            "title": "Phone Number"
+          },
+          "session_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Existing session id, for multi-turn continuity.",
+            "title": "Session Id"
+          },
+          "text": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Plain-text input when no audio is supplied.",
+            "title": "Text"
+          }
+        },
+        "title": "Body_run_turn_api_v1_calls_turn_post",
+        "type": "object"
+      },
+      "CallOutcome": {
+        "enum": [
+          "completed",
+          "degraded_text_only",
+          "failed"
+        ],
+        "title": "CallOutcome",
+        "type": "string"
+      },
+      "CallerOut": {
+        "description": "Who the demo assigned as the caller, so the page can tell the visitor who\nthey are for this call. Absent for a pre-sales call: a prospect has no account.",
+        "properties": {
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "phone_number": {
+            "title": "Phone Number",
+            "type": "string"
+          },
+          "plan": {
+            "title": "Plan",
+            "type": "string"
+          },
+          "suggestion": {
+            "description": "A line the visitor could open with, given this account.",
+            "title": "Suggestion",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "phone_number",
+          "plan",
+          "suggestion"
+        ],
+        "title": "CallerOut",
+        "type": "object"
+      },
+      "ConversationTurnOut": {
+        "properties": {
+          "content": {
+            "title": "Content",
+            "type": "string"
+          },
+          "persona": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Which persona produced this turn, if known.",
+            "title": "Persona"
+          },
+          "role": {
+            "title": "Role",
+            "type": "string"
+          },
+          "timestamp": {
+            "title": "Timestamp",
+            "type": "string"
+          }
+        },
+        "required": [
+          "role",
+          "content",
+          "timestamp"
+        ],
+        "title": "ConversationTurnOut",
+        "type": "object"
+      },
+      "CustomerOut": {
+        "properties": {
+          "account_balance": {
+            "title": "Account Balance",
+            "type": "number"
+          },
+          "account_id": {
+            "title": "Account Id",
+            "type": "string"
+          },
+          "active_plan": {
+            "title": "Active Plan",
+            "type": "string"
+          },
+          "currency": {
+            "title": "Currency",
+            "type": "string"
+          },
+          "customer_name": {
+            "title": "Customer Name",
+            "type": "string"
+          },
+          "data_usage_ratio": {
+            "description": "Computed server-side so every client renders the same usage bar\ninstead of each one re-deriving it (and disagreeing on cap == 0).",
+            "readOnly": true,
+            "title": "Data Usage Ratio",
+            "type": "number"
+          },
+          "last_updated": {
+            "format": "date-time",
+            "title": "Last Updated",
+            "type": "string"
+          },
+          "los_light": {
+            "$ref": "#/components/schemas/LOSLightState"
+          },
+          "payment_status": {
+            "$ref": "#/components/schemas/PaymentStatus"
+          },
+          "phone_number": {
+            "title": "Phone Number",
+            "type": "string"
+          },
+          "plan_data_cap_gb": {
+            "title": "Plan Data Cap Gb",
+            "type": "number"
+          },
+          "plan_data_used_gb": {
+            "title": "Plan Data Used Gb",
+            "type": "number"
+          },
+          "router_status": {
+            "$ref": "#/components/schemas/RouterStatus"
+          },
+          "support_tier": {
+            "title": "Support Tier",
+            "type": "string"
+          }
+        },
+        "required": [
+          "phone_number",
+          "customer_name",
+          "account_id",
+          "active_plan",
+          "plan_data_cap_gb",
+          "plan_data_used_gb",
+          "account_balance",
+          "currency",
+          "payment_status",
+          "support_tier",
+          "router_status",
+          "los_light",
+          "last_updated",
+          "data_usage_ratio"
+        ],
+        "title": "CustomerOut",
+        "type": "object"
+      },
+      "CustomerUpdateRequest": {
+        "description": "Single-field write, mirroring how a real BSS exposes subscriber\nmutations \u2014 and so every change is individually auditable.",
+        "properties": {
+          "field": {
+            "examples": [
+              "router_status"
+            ],
+            "title": "Field",
+            "type": "string"
+          },
+          "value": {
+            "examples": [
+              "Online"
+            ],
+            "title": "Value"
+          }
+        },
+        "required": [
+          "field",
+          "value"
+        ],
+        "title": "CustomerUpdateRequest",
+        "type": "object"
+      },
+      "DependencyStatus": {
+        "properties": {
+          "detail": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Detail"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "ready": {
+            "title": "Ready",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "name",
+          "ready"
+        ],
+        "title": "DependencyStatus",
+        "type": "object"
+      },
+      "ErrorResponse": {
+        "description": "Uniform error envelope for every non-2xx response.\n\n`code` is a stable machine-readable identifier the frontend switches on;\n`message` is safe to show a caller. Internal provider strings never appear\nin either.",
+        "properties": {
+          "code": {
+            "examples": [
+              "provider_rate_limited"
+            ],
+            "title": "Code",
+            "type": "string"
+          },
+          "message": {
+            "examples": [
+              "We're handling a lot of calls right now."
+            ],
+            "title": "Message",
+            "type": "string"
+          },
+          "request_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Correlates this response with server logs.",
+            "title": "Request Id"
+          }
+        },
+        "required": [
+          "code",
+          "message"
+        ],
+        "title": "ErrorResponse",
+        "type": "object"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail",
+            "type": "array"
+          }
+        },
+        "title": "HTTPValidationError",
+        "type": "object"
+      },
+      "HealthResponse": {
+        "description": "Liveness: the process is up and serving. Cheap, never touches a network.",
+        "properties": {
+          "env": {
+            "title": "Env",
+            "type": "string"
+          },
+          "status": {
+            "examples": [
+              "ok"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "version": {
+            "title": "Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "status",
+          "env",
+          "version"
+        ],
+        "title": "HealthResponse",
+        "type": "object"
+      },
+      "InputMode": {
+        "enum": [
+          "audio",
+          "text",
+          "greeting"
+        ],
+        "title": "InputMode",
+        "type": "string"
+      },
+      "LOSLightState": {
+        "enum": [
+          "Green",
+          "Red",
+          "Blinking Red",
+          "Off"
+        ],
+        "title": "LOSLightState",
+        "type": "string"
+      },
+      "OpenCallResponse": {
+        "description": "The agent's opening line. Same shape as a turn \u2014 `transcript` is empty\nbecause the caller has not spoken \u2014 plus who the caller is.",
+        "properties": {
+          "audio_base64": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Base64-encoded WAV of the reply. Null when TTS was unavailable.",
+            "title": "Audio Base64"
+          },
+          "audio_media_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "examples": [
+              "audio/wav"
+            ],
+            "title": "Audio Media Type"
+          },
+          "call_id": {
+            "title": "Call Id",
+            "type": "string"
+          },
+          "caller": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CallerOut"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Null when the persona takes prospects with no account."
+          },
+          "degraded_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Set when `outcome` is `degraded_text_only`.",
+            "title": "Degraded Reason"
+          },
+          "detected_language": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "BCP-47 language STT detected, if any.",
+            "title": "Detected Language"
+          },
+          "has_audio": {
+            "readOnly": true,
+            "title": "Has Audio",
+            "type": "boolean"
+          },
+          "input_mode": {
+            "$ref": "#/components/schemas/InputMode"
+          },
+          "outcome": {
+            "$ref": "#/components/schemas/CallOutcome"
+          },
+          "persona": {
+            "$ref": "#/components/schemas/PersonaId"
+          },
+          "response_text": {
+            "description": "What the agent replied, in the original script.",
+            "title": "Response Text",
+            "type": "string"
+          },
+          "sample_rate": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sample Rate"
+          },
+          "session_id": {
+            "description": "Pass this back on the next turn to continue the conversation.",
+            "title": "Session Id",
+            "type": "string"
+          },
+          "spoken_language": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "BCP-47 language the reply was actually synthesized in.",
+            "title": "Spoken Language"
+          },
+          "stages": {
+            "items": {
+              "$ref": "#/components/schemas/StageTimingOut"
+            },
+            "title": "Stages",
+            "type": "array"
+          },
+          "total_ms": {
+            "title": "Total Ms",
+            "type": "number"
+          },
+          "transcript": {
+            "description": "What the caller said, in the original script.",
+            "title": "Transcript",
+            "type": "string"
+          }
+        },
+        "required": [
+          "call_id",
+          "session_id",
+          "persona",
+          "input_mode",
+          "transcript",
+          "response_text",
+          "stages",
+          "total_ms",
+          "outcome",
+          "has_audio"
+        ],
+        "title": "OpenCallResponse",
+        "type": "object"
+      },
+      "PaymentStatus": {
+        "enum": [
+          "Current",
+          "Overdue",
+          "Suspended",
+          "Grace Period"
+        ],
+        "title": "PaymentStatus",
+        "type": "string"
+      },
+      "PersonaBreakdown": {
+        "properties": {
+          "avg_total_ms": {
+            "title": "Avg Total Ms",
+            "type": "number"
+          },
+          "call_count": {
+            "title": "Call Count",
+            "type": "integer"
+          },
+          "persona": {
+            "title": "Persona",
+            "type": "string"
+          },
+          "success_rate": {
+            "title": "Success Rate",
+            "type": "number"
+          }
+        },
+        "required": [
+          "persona",
+          "call_count",
+          "success_rate",
+          "avg_total_ms"
+        ],
+        "title": "PersonaBreakdown",
+        "type": "object"
+      },
+      "PersonaId": {
+        "description": "The personas the engine accepts. Validated at the API boundary, so an\nunknown id is a 422 rather than a silent fallback to the default agent.",
+        "enum": [
+          "novaconnect_default",
+          "kevin_l1",
+          "jessika_presales"
+        ],
+        "title": "PersonaId",
+        "type": "string"
+      },
+      "PersonaOut": {
+        "description": "One agent in the roster. The frontend renders its picker from this, so\nthe UI can never offer a persona the engine would reject.",
+        "properties": {
+          "accent": {
+            "title": "Accent",
+            "type": "string"
+          },
+          "display_name": {
+            "title": "Display Name",
+            "type": "string"
+          },
+          "id": {
+            "$ref": "#/components/schemas/PersonaId"
+          },
+          "initial": {
+            "title": "Initial",
+            "type": "string"
+          },
+          "pitch": {
+            "title": "Pitch",
+            "type": "string"
+          },
+          "role": {
+            "title": "Role",
+            "type": "string"
+          },
+          "tags": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Tags",
+            "type": "array"
+          }
+        },
+        "required": [
+          "id",
+          "display_name",
+          "initial",
+          "role",
+          "pitch",
+          "tags",
+          "accent"
+        ],
+        "title": "PersonaOut",
+        "type": "object"
+      },
+      "ReadinessResponse": {
+        "description": "Readiness: the process can actually handle a call right now.",
+        "properties": {
+          "active_sessions": {
+            "title": "Active Sessions",
+            "type": "integer"
+          },
+          "dependencies": {
+            "items": {
+              "$ref": "#/components/schemas/DependencyStatus"
+            },
+            "title": "Dependencies",
+            "type": "array"
+          },
+          "env": {
+            "title": "Env",
+            "type": "string"
+          },
+          "personas": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Personas",
+            "type": "array"
+          },
+          "state_backend": {
+            "examples": [
+              "redis",
+              "memory"
+            ],
+            "title": "State Backend",
+            "type": "string"
+          },
+          "status": {
+            "examples": [
+              "ready",
+              "degraded"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "version": {
+            "title": "Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "status",
+          "env",
+          "version",
+          "state_backend",
+          "active_sessions",
+          "personas",
+          "dependencies"
+        ],
+        "title": "ReadinessResponse",
+        "type": "object"
+      },
+      "RouterStatus": {
+        "enum": [
+          "Online",
+          "Offline",
+          "Rebooting",
+          "Degraded"
+        ],
+        "title": "RouterStatus",
+        "type": "string"
+      },
+      "SessionHistoryResponse": {
+        "description": "Lets a frontend rehydrate a conversation after a reload, instead of\nlosing the transcript with the page.",
+        "properties": {
+          "session_id": {
+            "title": "Session Id",
+            "type": "string"
+          },
+          "turns": {
+            "items": {
+              "$ref": "#/components/schemas/ConversationTurnOut"
+            },
+            "title": "Turns",
+            "type": "array"
+          }
+        },
+        "required": [
+          "session_id",
+          "turns"
+        ],
+        "title": "SessionHistoryResponse",
+        "type": "object"
+      },
+      "SessionResetResponse": {
+        "properties": {
+          "session_id": {
+            "title": "Session Id",
+            "type": "string"
+          },
+          "status": {
+            "default": "reset",
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "session_id"
+        ],
+        "title": "SessionResetResponse",
+        "type": "object"
+      },
+      "StageAverage": {
+        "properties": {
+          "avg_ms": {
+            "title": "Avg Ms",
+            "type": "number"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "sample_count": {
+            "title": "Sample Count",
+            "type": "integer"
+          },
+          "stage": {
+            "title": "Stage",
+            "type": "string"
+          }
+        },
+        "required": [
+          "stage",
+          "label",
+          "avg_ms",
+          "sample_count"
+        ],
+        "title": "StageAverage",
+        "type": "object"
+      },
+      "StageTimingOut": {
+        "properties": {
+          "elapsed_ms": {
+            "title": "Elapsed Ms",
+            "type": "number"
+          },
+          "label": {
+            "description": "Display label.",
+            "examples": [
+              "Sarvam Text LLM"
+            ],
+            "title": "Label",
+            "type": "string"
+          },
+          "stage": {
+            "description": "Canonical stage id.",
+            "examples": [
+              "llm_generation"
+            ],
+            "title": "Stage",
+            "type": "string"
+          }
+        },
+        "required": [
+          "stage",
+          "label",
+          "elapsed_ms"
+        ],
+        "title": "StageTimingOut",
+        "type": "object"
+      },
+      "TelemetryEntryOut": {
+        "properties": {
+          "call_id": {
+            "title": "Call Id",
+            "type": "string"
+          },
+          "detected_language": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Detected Language"
+          },
+          "error_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error Code"
+          },
+          "error_detail": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error Detail"
+          },
+          "input_mode": {
+            "$ref": "#/components/schemas/InputMode"
+          },
+          "outcome": {
+            "$ref": "#/components/schemas/CallOutcome"
+          },
+          "persona": {
+            "title": "Persona",
+            "type": "string"
+          },
+          "phone_number": {
+            "title": "Phone Number",
+            "type": "string"
+          },
+          "response_text": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Response Text"
+          },
+          "session_id": {
+            "title": "Session Id",
+            "type": "string"
+          },
+          "stages": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "description": "Canonical stage id -> elapsed ms.",
+            "title": "Stages",
+            "type": "object"
+          },
+          "timestamp": {
+            "format": "date-time",
+            "title": "Timestamp",
+            "type": "string"
+          },
+          "total_ms": {
+            "title": "Total Ms",
+            "type": "number"
+          },
+          "transcript": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Transcript"
+          }
+        },
+        "required": [
+          "call_id",
+          "session_id",
+          "phone_number",
+          "persona",
+          "timestamp",
+          "input_mode",
+          "detected_language",
+          "transcript",
+          "response_text",
+          "total_ms",
+          "outcome",
+          "error_code",
+          "error_detail"
+        ],
+        "title": "TelemetryEntryOut",
+        "type": "object"
+      },
+      "TelemetryResponse": {
+        "properties": {
+          "entries": {
+            "items": {
+              "$ref": "#/components/schemas/TelemetryEntryOut"
+            },
+            "title": "Entries",
+            "type": "array"
+          },
+          "summary": {
+            "$ref": "#/components/schemas/TelemetrySummary"
+          }
+        },
+        "required": [
+          "summary",
+          "entries"
+        ],
+        "title": "TelemetryResponse",
+        "type": "object"
+      },
+      "TelemetrySummary": {
+        "properties": {
+          "avg_total_ms": {
+            "title": "Avg Total Ms",
+            "type": "number"
+          },
+          "by_persona": {
+            "items": {
+              "$ref": "#/components/schemas/PersonaBreakdown"
+            },
+            "title": "By Persona",
+            "type": "array"
+          },
+          "p95_total_ms": {
+            "title": "P95 Total Ms",
+            "type": "number"
+          },
+          "stage_averages": {
+            "items": {
+              "$ref": "#/components/schemas/StageAverage"
+            },
+            "title": "Stage Averages",
+            "type": "array"
+          },
+          "success_rate": {
+            "description": "0.0-1.0, counting degraded turns as successes.",
+            "title": "Success Rate",
+            "type": "number"
+          },
+          "total_calls": {
+            "title": "Total Calls",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "total_calls",
+          "success_rate",
+          "avg_total_ms",
+          "p95_total_ms",
+          "stage_averages",
+          "by_persona"
+        ],
+        "title": "TelemetrySummary",
+        "type": "object"
+      },
+      "TurnResponse": {
+        "properties": {
+          "audio_base64": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Base64-encoded WAV of the reply. Null when TTS was unavailable.",
+            "title": "Audio Base64"
+          },
+          "audio_media_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "examples": [
+              "audio/wav"
+            ],
+            "title": "Audio Media Type"
+          },
+          "call_id": {
+            "title": "Call Id",
+            "type": "string"
+          },
+          "degraded_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Set when `outcome` is `degraded_text_only`.",
+            "title": "Degraded Reason"
+          },
+          "detected_language": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "BCP-47 language STT detected, if any.",
+            "title": "Detected Language"
+          },
+          "has_audio": {
+            "readOnly": true,
+            "title": "Has Audio",
+            "type": "boolean"
+          },
+          "input_mode": {
+            "$ref": "#/components/schemas/InputMode"
+          },
+          "outcome": {
+            "$ref": "#/components/schemas/CallOutcome"
+          },
+          "persona": {
+            "$ref": "#/components/schemas/PersonaId"
+          },
+          "response_text": {
+            "description": "What the agent replied, in the original script.",
+            "title": "Response Text",
+            "type": "string"
+          },
+          "sample_rate": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sample Rate"
+          },
+          "session_id": {
+            "description": "Pass this back on the next turn to continue the conversation.",
+            "title": "Session Id",
+            "type": "string"
+          },
+          "spoken_language": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "BCP-47 language the reply was actually synthesized in.",
+            "title": "Spoken Language"
+          },
+          "stages": {
+            "items": {
+              "$ref": "#/components/schemas/StageTimingOut"
+            },
+            "title": "Stages",
+            "type": "array"
+          },
+          "total_ms": {
+            "title": "Total Ms",
+            "type": "number"
+          },
+          "transcript": {
+            "description": "What the caller said, in the original script.",
+            "title": "Transcript",
+            "type": "string"
+          }
+        },
+        "required": [
+          "call_id",
+          "session_id",
+          "persona",
+          "input_mode",
+          "transcript",
+          "response_text",
+          "stages",
+          "total_ms",
+          "outcome",
+          "has_audio"
+        ],
+        "title": "TurnResponse",
+        "type": "object"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "title": "Location",
+            "type": "array"
+          },
+          "msg": {
+            "title": "Message",
+            "type": "string"
+          },
+          "type": {
+            "title": "Error Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError",
+        "type": "object"
+      }
+    },
+    "securitySchemes": {
+      "APIKeyHeader": {
+        "description": "Operator API key. Configure via OPERATOR_API_KEYS.",
+        "in": "header",
+        "name": "X-API-Key",
+        "type": "apiKey"
+      }
+    }
+  },
+  "info": {
+    "description": "Voice pipeline on Sarvam AI: speech-to-text, CRM context, text generation, and speech synthesis. Every response is a declared JSON schema, so a typed client can be generated directly from this document.",
+    "title": "NovaConnect Telecoms Conversational IVR Engine",
+    "version": "2.0.0"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/api/v1/calls/open": {
+      "post": {
+        "description": "Assigns the caller (a random demo subscriber for the agents that take existing customers; nobody for pre-sales), greets them, and returns the greeting as text and audio. Pass the returned `session_id` and `caller.phone_number` on every following turn.",
+        "operationId": "open_call_api_v1_calls_open_post",
+        "requestBody": {
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_open_call_api_v1_calls_open_post"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OpenCallResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Malformed or empty input."
+          },
+          "402": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Provider credits exhausted."
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Audio upload exceeds the size ceiling."
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "No speech could be transcribed."
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Rate limited."
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Upstream provider failure."
+          },
+          "504": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Upstream provider timeout."
+          }
+        },
+        "summary": "Start a call: the agent speaks first",
+        "tags": [
+          "calls"
+        ]
+      }
+    },
+    "/api/v1/calls/personas": {
+      "get": {
+        "description": "The personas this engine will accept. The frontend renders its agent picker from this list, so the UI cannot offer an agent the engine would reject.",
+        "operationId": "get_personas_api_v1_calls_personas_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/PersonaOut"
+                  },
+                  "title": "Response Get Personas Api V1 Calls Personas Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "The agent roster",
+        "tags": [
+          "calls"
+        ]
+      }
+    },
+    "/api/v1/calls/sessions/{session_id}": {
+      "delete": {
+        "description": "Called by the frontend's End Call action. Idempotent \u2014 resetting an unknown or already-cleared session succeeds. Unauthenticated because a caller ending their own call must always work, and a session id is an unguessable UUID.",
+        "operationId": "reset_session_api_v1_calls_sessions__session_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "session_id",
+            "required": true,
+            "schema": {
+              "title": "Session Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionResetResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "End a call and clear its memory",
+        "tags": [
+          "calls"
+        ]
+      },
+      "get": {
+        "description": "Operator-only: session transcripts contain what callers said. Used by the console to rehydrate a conversation after a reload.",
+        "operationId": "get_session_history_api_v1_calls_sessions__session_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "session_id",
+            "required": true,
+            "schema": {
+              "title": "Session Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionHistoryResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "summary": "Read a session's conversation history",
+        "tags": [
+          "calls"
+        ]
+      }
+    },
+    "/api/v1/calls/turn": {
+      "post": {
+        "description": "Accepts EITHER a multipart `audio` file OR a plain-text `text` field; audio takes precedence when both are supplied. Always returns the same JSON shape \u2014 reply audio rides in `audio_base64`, and is null when speech synthesis was unavailable (`outcome: degraded_text_only`) rather than failing the call.",
+        "operationId": "run_turn_api_v1_calls_turn_post",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_run_turn_api_v1_calls_turn_post"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TurnResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Malformed or empty input."
+          },
+          "402": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Provider credits exhausted."
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Audio upload exceeds the size ceiling."
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "No speech could be transcribed."
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Rate limited."
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Upstream provider failure."
+          },
+          "504": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Upstream provider timeout."
+          }
+        },
+        "summary": "Run one conversational turn",
+        "tags": [
+          "calls"
+        ]
+      }
+    },
+    "/api/v1/customers": {
+      "get": {
+        "operationId": "list_customers_api_v1_customers_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/CustomerOut"
+                  },
+                  "title": "Response List Customers Api V1 Customers Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "summary": "List subscribers",
+        "tags": [
+          "crm"
+        ]
+      }
+    },
+    "/api/v1/customers/{phone_number}": {
+      "get": {
+        "operationId": "get_customer_api_v1_customers__phone_number__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "phone_number",
+            "required": true,
+            "schema": {
+              "title": "Phone Number",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomerOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "summary": "Look up one subscriber by MSISDN",
+        "tags": [
+          "crm"
+        ]
+      },
+      "patch": {
+        "description": "Single-field, auditable write \u2014 e.g. flipping `router_status` to `Online` after a guided reboot, or advancing `payment_status` once a payment clears. Identity fields (name, account id, MSISDN) are not writable here.",
+        "operationId": "update_customer_api_v1_customers__phone_number__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "phone_number",
+            "required": true,
+            "schema": {
+              "title": "Phone Number",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CustomerUpdateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomerOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "summary": "Write one field on a subscriber record",
+        "tags": [
+          "crm"
+        ]
+      }
+    },
+    "/api/v1/healthz": {
+      "get": {
+        "operationId": "healthz_api_v1_healthz_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Liveness probe",
+        "tags": [
+          "ops"
+        ]
+      }
+    },
+    "/api/v1/readyz": {
+      "get": {
+        "operationId": "readyz_api_v1_readyz_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReadinessResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Readiness probe",
+        "tags": [
+          "ops"
+        ]
+      }
+    },
+    "/api/v1/telemetry": {
+      "get": {
+        "operationId": "get_telemetry_api_v1_telemetry_get",
+        "parameters": [
+          {
+            "description": "Most recent N turns.",
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 200,
+              "description": "Most recent N turns.",
+              "maximum": 500,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Filter to one persona id.",
+            "in": "query",
+            "name": "persona",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter to one persona id.",
+              "title": "Persona"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TelemetryResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "summary": "Recent call telemetry with server-computed aggregates",
+        "tags": [
+          "telemetry"
+        ]
+      }
+    },
+    "/api/v1/telemetry/summary": {
+      "get": {
+        "operationId": "get_telemetry_summary_api_v1_telemetry_summary_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 200,
+              "maximum": 500,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TelemetrySummary"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "summary": "Aggregates only \u2014 for a polling dashboard header",
+        "tags": [
+          "telemetry"
+        ]
+      }
+    }
+  }
+}

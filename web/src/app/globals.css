@@ -1,0 +1,384 @@
+@import "tailwindcss";
+
+/* =============================================================================
+   Design tokens — the single source of truth for both surfaces.
+
+   The customer live line and the operator console are one design system, not
+   two products that happen to share a repo. Every colour, radius, and shadow
+   either page uses resolves to a token defined here.
+
+   Palette brief: warm yellow-beige canvas, one confident brand accent (now
+   the NovaConnect logo's purple — see --brand below), no blue, no red anywhere in
+   status colours. Agents are told apart by VALUE (light/dark steps of the
+   same brand hue), not by hue — there is deliberately only one accent hue
+   family across buttons, links and identity colour on this entire site.
+   The hero mic and its glow are the one deliberate exception: hard-coded
+   gold in mic-orbit.tsx, untouched by this file on purpose.
+
+   Light only. Nothing in a component may hard-code a hex value. If a colour
+   is needed and no token fits, the token set is what changes.
+   ========================================================================== */
+
+:root {
+  /* -- Surfaces: white canvas, cool lavender-grey supporting neutral --------
+     Beige/gold is now reserved for exactly one place: the hero mic and its
+     glow, hard-coded in mic-orbit.tsx and never read from this file. Every
+     other neutral — wells, hairlines, ink, chart grid — runs on a low-
+     saturation step of the brand purple instead, so the rest of the UI
+     reads as one cohesive cool theme rather than beige leaking in from the
+     old palette everywhere the mic isn't. */
+  --surface-page: #ffffff;
+  --surface: #ffffff;
+  --surface-raised: #ffffff;
+  --surface-sunken: #f1edf8;
+  --surface-overlay: #ffffff;
+
+  /* -- Lines --------------------------------------------------------------- */
+  --border-hairline: #e6e0f2;
+  --border-strong: #d1c4e8;
+
+  /* -- Text: three levels, no more ---------------------------------------- */
+  --ink: #211c2e;
+  --ink-secondary: #5c5570;
+  --ink-muted: #7a7290;
+  --ink-inverted: #ffffff;
+
+  /* -- Brand — a single confident accent, used sparingly ---------------------
+     Sampled straight from the NovaConnect logo mark (#6c2dc4), not eyeballed to
+     taste. 7.47:1 on white. This is a deliberate exception to the old
+     "one hue, no blue/red, no purple" brief: the logo set the hue, so the
+     brand accent now follows it. The hero mic and its glow stay outside
+     this system entirely — they're hard-coded gold in mic-orbit.tsx, not
+     tokens, specifically so a brand-colour change like this one can never
+     touch them. */
+  --brand: #6c2dc4;
+  --brand-hover: #5a24a3;
+  --brand-soft: #efe6fb;
+  --brand-ink: #ffffff;
+  --brand-rgb: 108, 45, 196;
+
+  /* -- Agent accents: one hue, three VALUES ---------------------------------
+     Same rule as before, just re-based on the new brand hue: agents read
+     apart by contrast, not by colour — stepped dark -> mid -> light, never
+     three hues. Each step still has to carry its own text (a badge's tone
+     colour is its label) and sit as a solid button fill under white text, so
+     checked against that, not eyeballed:
+       contrast(#4a1d87, #fff) = 11.56   (default — darkest)
+       contrast(#6c2dc4, #fff) =  7.47   (kevin — mid, same as brand)
+       contrast(#8b52d6, #fff) =  4.91   (jessika — lightest usable step)
+     The *-rgb triplets exist only for the hover glow, which needs to land
+     inside an rgba() rather than combine with a hex custom property. */
+  --agent-default: #4a1d87;
+  --agent-default-soft: #e8def5;
+  --agent-default-rgb: 74, 29, 135;
+  --agent-kevin: #6c2dc4;
+  --agent-kevin-soft: #ede1fa;
+  --agent-kevin-rgb: 108, 45, 196;
+  --agent-jessika: #8b52d6;
+  --agent-jessika-soft: #f1e9fb;
+  --agent-jessika-rgb: 139, 82, 214;
+
+  /* -- Status ---------------------------------------------------------------
+     No blue, no red — including here. "Critical" reads as serious through
+     depth (a near-black plum, the darkest thing on the page short of ink)
+     and the XCircle icon it always ships with, never through a red hue.
+     Each step >=4.5:1 on white, checked: good 6.14, warning 5.37,
+     critical 9.89. */
+  --status-good: #4b6b1d;
+  --status-good-soft: #e7eeda;
+  --status-warning: #9c5b05;
+  --status-warning-soft: #f5e6d0;
+  --status-critical: #5a3a44;
+  --status-critical-soft: #f0e1ea;
+  /* "Neutral" is the one status tone with no state to signal — it should
+     read as the same structural grey as ink-muted, not as a leftover warm
+     beige, so it now shares that exact step. */
+  --status-neutral: #7a7290;
+  --status-neutral-soft: #f1edf8;
+
+  /* -- Categorical chart ramp -----------------------------------------------
+     Pipeline stage 1 is always olive, in every chart, on every page — fixed
+     order, never cycled or reassigned per filter. No blue, no red: olive /
+     gold / terracotta / plum, run through the dataviz skill's validator
+     against this (now white) surface, not eyeballed:
+       node validate_palette.js "#5c7a1f,#c99a2e,#8b4513,#96428e" \
+         --mode light --surface #ffffff
+       lightness band PASS · chroma floor PASS
+       worst adjacent CVD ΔE 13.8 (protan) · normal vision 17.5
+       contrast WARN on gold (2.58) — relief required: every bar in
+       StageLatencyChart carries a direct value label, which is the relief. */
+  --chart-1: #5c7a1f;
+  --chart-2: #c99a2e;
+  --chart-3: #8b4513;
+  --chart-4: #96428e;
+  /* Grid/axis are structural chrome, not data — they follow the neutral
+     border tokens above, not the (unchanged) data ramp. */
+  --chart-grid: #e6e0f2;
+  --chart-axis: #d1c4e8;
+
+  /* -- Elevation — flat by default; shadow only where something truly lifts
+     off the page (menus, tooltips), never as card decoration --------------- */
+  --shadow-sm: 0 1px 2px rgb(33 28 46 / 0.08);
+  --shadow-md: 0 2px 10px -2px rgb(33 28 46 / 0.12);
+  --shadow-lg: 0 12px 28px -10px rgb(33 28 46 / 0.2);
+
+  /* -- Ambient flakes: the page-wide drifting layer that carries the hero
+     flakes down the rest of the scroll (page-flakes.tsx). */
+  --flake-light: #f6fdfc;
+  --flake-mid: #c4ece7;
+  --flake-deep: #6cc7bf;
+  --flake-rgb: 108, 199, 191;
+
+  color-scheme: light;
+}
+
+@theme inline {
+  --color-surface-page: var(--surface-page);
+  --color-surface: var(--surface);
+  --color-surface-raised: var(--surface-raised);
+  --color-surface-sunken: var(--surface-sunken);
+  --color-surface-overlay: var(--surface-overlay);
+
+  --color-hairline: var(--border-hairline);
+  --color-strong: var(--border-strong);
+
+  --color-ink: var(--ink);
+  --color-ink-secondary: var(--ink-secondary);
+  --color-ink-muted: var(--ink-muted);
+  --color-ink-inverted: var(--ink-inverted);
+
+  --color-brand: var(--brand);
+  --color-brand-hover: var(--brand-hover);
+  --color-brand-soft: var(--brand-soft);
+  --color-brand-ink: var(--brand-ink);
+
+  --color-agent: var(--agent-accent, var(--agent-default));
+  --color-agent-soft: var(--agent-accent-soft, var(--agent-default-soft));
+
+  --color-good: var(--status-good);
+  --color-good-soft: var(--status-good-soft);
+  --color-warning: var(--status-warning);
+  --color-warning-soft: var(--status-warning-soft);
+  --color-critical: var(--status-critical);
+  --color-critical-soft: var(--status-critical-soft);
+  --color-neutral: var(--status-neutral);
+  --color-neutral-soft: var(--status-neutral-soft);
+
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains-mono), ui-monospace, "SF Mono", monospace;
+
+  --radius-card: 0.875rem;
+  --radius-control: 0.55rem;
+  --radius-pill: 999px;
+
+  --shadow-card: var(--shadow-sm);
+  --shadow-raised: var(--shadow-md);
+  --shadow-overlay: var(--shadow-lg);
+}
+
+/* -----------------------------------------------------------------------------
+   Agent theming.
+
+   A persona's accent is set once, as a scope, by adding data-agent to any
+   container. Everything inside it renders in that agent's colour through
+   `bg-agent` / `text-agent` / `border-agent` — no per-persona component
+   variants, no colour props threaded down the tree. `--agent-accent-rgb`
+   drives the hover glow (box-shadow can't read a hex custom property into
+   an alpha channel, so the numeric triplet exists purely for that).
+   -------------------------------------------------------------------------- */
+[data-agent="novaconnect_default"] {
+  --agent-accent: var(--agent-default);
+  --agent-accent-soft: var(--agent-default-soft);
+  --agent-accent-rgb: var(--agent-default-rgb);
+}
+[data-agent="kevin_l1"] {
+  --agent-accent: var(--agent-kevin);
+  --agent-accent-soft: var(--agent-kevin-soft);
+  --agent-accent-rgb: var(--agent-kevin-rgb);
+}
+[data-agent="jessika_presales"] {
+  --agent-accent: var(--agent-jessika);
+  --agent-accent-soft: var(--agent-jessika-soft);
+  --agent-accent-rgb: var(--agent-jessika-rgb);
+}
+
+@layer base {
+  * {
+    border-color: var(--border-hairline);
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  /* Lenis' required rules: it drives scrolling, so native smoothing is off
+     and a stopped page must not scroll underneath it. */
+  html.lenis,
+  html.lenis body {
+    height: auto;
+  }
+  .lenis.lenis-smooth {
+    scroll-behavior: auto !important;
+  }
+  .lenis.lenis-smooth [data-lenis-prevent] {
+    overscroll-behavior: contain;
+  }
+  .lenis.lenis-stopped {
+    overflow: clip;
+  }
+
+  body {
+    background-color: var(--surface-page);
+    color: var(--ink);
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    letter-spacing: -0.018em;
+    text-wrap: balance;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--brand);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  /* Tabular figures everywhere a number updates in place, so latency readouts
+     and timers don't jitter as digits change width. */
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+/* -----------------------------------------------------------------------------
+   Hero motion.
+
+   Three effects, each doing one job: the orbit rings turn steadily around
+   the static orb (rotate only — the orb itself never pulses, "static
+   polish" was the brief), the wave paths drift sideways on a seamless loop,
+   and wave-drift is duplicated at a half-phase offset per path so the seam
+   is never visible. All three freeze under reduced motion, below.
+   -------------------------------------------------------------------------- */
+@keyframes wave-drift {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes flake-drift {
+  0% {
+    transform: translate3d(0, 0, 0) rotate(var(--r0, 0deg));
+  }
+  100% {
+    transform: translate3d(var(--dx, 20px), var(--dy, -26px), 0) rotate(var(--r1, 24deg));
+  }
+}
+
+@keyframes blob-morph {
+  0%,
+  100% {
+    border-radius: 58% 42% 55% 45% / 46% 56% 44% 54%;
+  }
+  33% {
+    border-radius: 44% 56% 42% 58% / 58% 42% 56% 44%;
+  }
+  66% {
+    border-radius: 52% 48% 60% 40% / 42% 58% 46% 54%;
+  }
+}
+
+@keyframes ring-out {
+  from {
+    transform: scale(1);
+    opacity: 0.45;
+  }
+  to {
+    transform: scale(1.9);
+    opacity: 0;
+  }
+}
+
+@keyframes dash-flow {
+  to {
+    stroke-dashoffset: -220;
+  }
+}
+
+@keyframes card-zoom-in {
+  from {
+    transform: scale(0.12);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes card-zoom-out {
+  from {
+    transform: scale(1);
+    opacity: 1;
+  }
+  to {
+    transform: scale(0.12);
+    opacity: 0;
+  }
+}
+
+@keyframes cue-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes cue-bob {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  60% {
+    transform: translateY(12px);
+    opacity: 0.2;
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

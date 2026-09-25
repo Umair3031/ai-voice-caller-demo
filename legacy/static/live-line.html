@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Live Line · NovaConnect Telecoms</title>
+<meta name="description" content="Pick an AI agent and talk to them right now, powered by the NovaConnect Sarvam voice stack.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;600;700;800&family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    color-scheme: dark;
+    --bg: #0a0d12;
+    --bg-elevated: #10141b;
+    --surface: #151a23;
+    --surface-2: #1c2330;
+    --hairline: #262e3c;
+    --hairline-soft: #1c2330;
+    --text: #f2f4f8;
+    --text-dim: #9aa4b6;
+    --text-faint: #5b6376;
+    --kevin: #35d8c2;
+    --kevin-soft: rgba(53,216,194,0.14);
+    --jess: #ff7f5c;
+    --jess-soft: rgba(255,127,92,0.16);
+    --live: #f2c230;
+    --danger: #ff5f6d;
+    --agent-accent: var(--kevin);
+    --agent-soft: var(--kevin-soft);
+    --font-display: 'Unbounded', system-ui, sans-serif;
+    --font-body: 'Hanken Grotesk', system-ui, -apple-system, sans-serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', monospace;
+  }
+  *{ box-sizing:border-box; }
+  html, body{ margin:0; padding:0; }
+  body{
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.5;
+  }
+  h1,h2,h3{ font-family: var(--font-display); margin:0; text-wrap: balance; }
+  p{ margin:0; }
+  button{ font-family: inherit; cursor:pointer; }
+  img,svg{ max-width:100%; }
+  [hidden]{ display:none !important; }
+  :focus-visible{ outline: 2px solid var(--agent-accent); outline-offset: 3px; border-radius: 4px; }
+
+  .shell{ max-width: 1180px; margin: 0 auto; padding-inline: 24px; }
+
+  .topbar{
+    position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20;
+    display:flex; align-items:center; justify-content:space-between;
+    padding-block: 16px;
+    background: rgba(10,13,18,0.78);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--hairline-soft);
+  }
+  .topbar-inner{ max-width:1180px; margin:0 auto; padding-inline:24px; width:100%; display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+  .brand{ display:flex; align-items:baseline; gap:10px; }
+  .brand-mark{ font-family: var(--font-display); font-weight:700; font-size: 1rem; letter-spacing: 0.02em; }
+  .brand-sub{ font-size: 0.78rem; color: var(--text-dim); }
+  .status-pill{ display:flex; align-items:center; gap:8px; font-family: var(--font-mono); font-size:0.72rem; color: var(--text-dim); border:1px solid var(--hairline); padding:6px 12px; border-radius:999px; }
+  .status-pill .dot{ width:7px; height:7px; border-radius:50%; background: var(--live); box-shadow: 0 0 0 3px rgba(242,194,48,0.18); }
+
+  .hero{ position: relative; padding-block: 72px 40px; overflow: hidden; }
+  .hero canvas{ position:absolute; inset:0; width:100%; height:100%; opacity:0.55; pointer-events:none; }
+  .hero-content{ position:relative; max-width: 680px; }
+  .eyebrow{ font-family: var(--font-mono); font-size:0.78rem; letter-spacing:0.06em; text-transform:uppercase; color: var(--text-dim); margin-bottom:18px; display:inline-block; }
+  .headline{ font-size: clamp(2.4rem, 6vw, 4.1rem); font-weight: 700; letter-spacing: -0.01em; line-height: 1.04; margin-bottom: 22px; }
+  .accent-gradient{ background: linear-gradient(90deg, var(--kevin), var(--jess)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .sub{ font-size: clamp(1rem, 1.6vw, 1.15rem); color: var(--text-dim); max-width: 56ch; }
+
+  .caller-id{
+    margin-top:28px; display:flex; flex-wrap:wrap; align-items:center; gap:12px;
+    background: var(--surface); border:1px solid var(--hairline); border-radius:14px; padding:12px 16px; max-width: 480px;
+  }
+  .caller-id label{ font-family: var(--font-mono); font-size:0.72rem; color: var(--text-dim); text-transform:uppercase; letter-spacing:0.04em; }
+  .caller-id input{
+    flex:1; min-width:160px; background: var(--bg-elevated); border:1px solid var(--hairline); color: var(--text);
+    font-family: var(--font-mono); font-size:0.9rem; padding:9px 12px; border-radius:8px;
+  }
+  .caller-id input:focus-visible{ outline: 2px solid var(--live); outline-offset:1px; }
+  .caller-id .hint2{ width:100%; font-size:0.74rem; color: var(--text-faint); }
+
+  .roster{ display:grid; grid-template-columns: 1fr 1fr; gap:20px; padding-block: 32px 64px; }
+  @media (max-width: 720px){ .roster{ grid-template-columns: 1fr; } }
+
+  .agent-card{
+    --card-accent: var(--kevin); --card-soft: var(--kevin-soft);
+    background: linear-gradient(180deg, var(--surface), var(--bg-elevated));
+    border: 1px solid var(--hairline); border-radius: 20px; padding: 26px;
+    display:flex; flex-direction:column; gap:16px;
+    transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease;
+  }
+  .agent-card[data-agent="jessika"]{ --card-accent: var(--jess); --card-soft: var(--jess-soft); }
+  .agent-card:hover, .agent-card:focus-visible{ transform: translateY(-4px); border-color: var(--card-accent); box-shadow: 0 18px 40px -22px var(--card-accent); }
+  .agent-card.is-active{ border-color: var(--card-accent); box-shadow: 0 0 0 1px var(--card-accent); }
+
+  .card-top{ display:flex; align-items:center; justify-content:space-between; }
+  .avatar{
+    width:52px; height:52px; border-radius:16px; display:flex; align-items:center; justify-content:center;
+    font-family: var(--font-display); font-weight:700; font-size:1.1rem;
+    background: linear-gradient(140deg, var(--card-accent), transparent 140%);
+    background-color: var(--card-soft); color: var(--card-accent); border: 1px solid var(--card-accent);
+  }
+  .avatar--kevin{ --card-accent: var(--kevin); }
+  .avatar--jess{ --card-accent: var(--jess); }
+  .avatar--sm{ width:40px; height:40px; border-radius:12px; font-size:0.95rem; }
+
+  .pill{ font-family: var(--font-mono); font-size:0.68rem; letter-spacing:0.04em; padding:5px 10px; border-radius:999px; text-transform:uppercase; }
+  .pill--online{ color:#8ff0dd; background: rgba(53,216,194,0.12); border:1px solid rgba(53,216,194,0.35); }
+
+  .agent-card h2{ font-size:1.5rem; }
+  .role{ font-family: var(--font-mono); font-size:0.78rem; color: var(--card-accent); }
+  .pitch{ color: var(--text-dim); font-size:0.95rem; }
+  .tags{ display:flex; flex-wrap:wrap; gap:8px; }
+  .tags span{ font-size:0.72rem; color: var(--text-dim); border:1px solid var(--hairline); padding:5px 10px; border-radius:999px; }
+
+  .cta{ margin-top:auto; background: var(--card-accent); color:#0a0d12; border:none; font-weight:700; font-size:0.92rem; padding:13px 18px; border-radius:12px; transition: filter .15s ease, transform .15s ease; }
+  .cta:hover{ filter: brightness(1.08); transform: translateY(-1px); }
+  .cta:disabled{ opacity:0.5; cursor:not-allowed; transform:none; }
+
+  .call-panel{ background: var(--bg-elevated); border:1px solid var(--hairline); border-radius:22px; padding: 24px; margin-block-end: 72px; scroll-margin-top: 90px; }
+  #callPanel[data-agent="jessika"]{ --agent-accent: var(--jess); --agent-soft: var(--jess-soft); }
+  #callPanel[data-agent="kevin"]{ --agent-accent: var(--kevin); --agent-soft: var(--kevin-soft); }
+
+  .call-header{ display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; }
+  .call-who{ display:flex; align-items:center; gap:12px; }
+  .call-who .avatar{ border-color: var(--agent-accent); color: var(--agent-accent); background-color: var(--agent-soft); }
+  .call-status{ font-family: var(--font-mono); font-size:0.78rem; color: var(--agent-accent); display:flex; align-items:center; gap:7px; }
+  .call-status .rec-dot{ width:7px; height:7px; border-radius:50%; background: var(--danger); display:none; }
+  .call-status.is-recording .rec-dot{ display:inline-block; animation: recPulse 1s ease-in-out infinite; }
+  @keyframes recPulse{ 0%,100%{ opacity:1;} 50%{ opacity:0.25;} }
+  .call-meta{ display:flex; align-items:center; gap:14px; }
+  .timer{ font-family: var(--font-mono); font-size:0.95rem; color: var(--text-dim); font-variant-numeric: tabular-nums; }
+  .end-btn{ background: rgba(255,95,109,0.12); color: var(--danger); border:1px solid rgba(255,95,109,0.4); font-size:0.82rem; font-weight:600; padding:9px 16px; border-radius:999px; }
+  .end-btn:hover{ background: rgba(255,95,109,0.2); }
+
+  .waveform{ display:flex; align-items:center; justify-content:center; gap:3px; height:56px; margin-block:22px; }
+  .waveform .bar{ width:4px; min-height:6px; height:56px; border-radius:3px; background: var(--agent-accent); opacity:0.85; transform: scaleY(0.15); transform-origin:center; transition: transform .3s ease; }
+  .waveform.is-speaking .bar{ animation: barPulse 0.9s ease-in-out infinite; }
+  .waveform.is-recording .bar{ animation: barPulse 1.15s ease-in-out infinite; background: var(--danger); }
+  @keyframes barPulse{ 0%,100%{ transform: scaleY(0.18);} 50%{ transform: scaleY(1);} }
+  @media (prefers-reduced-motion: reduce){ .waveform.is-speaking .bar, .waveform.is-recording .bar{ animation:none; transform: scaleY(0.6); } }
+
+  .transcript{ display:flex; flex-direction:column; gap:10px; min-height:64px; margin-block-end:20px; max-height: 46vh; overflow-y:auto; }
+  .bubble{ max-width: 72ch; padding:11px 15px; border-radius:14px; font-size:0.92rem; animation: rise 0.25s ease both; }
+  @keyframes rise{ from{ opacity:0; transform: translateY(6px);} to{ opacity:1; transform:none; } }
+  @media (prefers-reduced-motion: reduce){ .bubble{ animation:none; } }
+  .bubble--agent{ background: var(--agent-soft); border:1px solid var(--agent-accent); align-self:flex-start; border-bottom-left-radius:4px; }
+  .bubble--user{ background: var(--surface-2); border:1px solid var(--hairline); align-self:flex-end; border-bottom-right-radius:4px; color: var(--text-dim); }
+  .bubble--system{ align-self:center; color: var(--text-faint); font-family: var(--font-mono); font-size:0.76rem; background:none; border:1px dashed var(--hairline); }
+
+  .call-controls{ display:flex; flex-direction:column; align-items:center; gap:10px; }
+  .mic-btn{ width:64px; height:64px; border-radius:50%; border:1px solid var(--agent-accent); background: var(--agent-soft); color: var(--agent-accent); display:flex; align-items:center; justify-content:center; transition: transform .12s ease, box-shadow .2s ease, background .2s ease, border-color .2s ease; }
+  .mic-btn svg{ width:26px; height:26px; }
+  .mic-btn:not(:disabled):hover{ transform: scale(1.05); }
+  .mic-btn.is-recording{ background: rgba(255,95,109,0.16); border-color: var(--danger); color: var(--danger); box-shadow: 0 0 0 8px rgba(255,95,109,0.12); animation: micPulse 1.4s ease-in-out infinite; }
+  @keyframes micPulse{ 0%,100%{ box-shadow: 0 0 0 6px rgba(255,95,109,0.12);} 50%{ box-shadow: 0 0 0 12px transparent;} }
+  @media (prefers-reduced-motion: reduce){ .mic-btn.is-recording{ animation:none; } }
+  .mic-btn:disabled{ opacity:0.35; cursor:not-allowed; }
+  .hint{ font-size:0.78rem; color: var(--text-faint); text-align:center; max-width:46ch; }
+
+  .call-footnote{ margin-top:20px; padding-top:16px; border-top:1px dashed var(--hairline); font-size:0.76rem; color: var(--text-faint); font-family: var(--font-mono); }
+
+  .error-banner{ background: rgba(255,95,109,0.1); border:1px solid rgba(255,95,109,0.4); color:#ffb3ba; border-radius:12px; padding:12px 16px; font-size:0.86rem; margin-block-end:16px; }
+
+  .foot{ padding-block:32px 56px; border-top:1px solid var(--hairline-soft); }
+  .foot p{ font-size:0.78rem; color: var(--text-faint); text-align:center; }
+
+  .sr-only{ position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="brand">
+      <span class="brand-mark">NovaConnect</span>
+      <span class="brand-sub">Live Agent Line</span>
+    </div>
+    <div class="status-pill"><span class="dot"></span>Specialists online</div>
+  </div>
+</div>
+
+<div class="shell">
+  <main>
+    <section class="hero">
+      <canvas id="ambient" aria-hidden="true"></canvas>
+      <div class="hero-content">
+        <span class="eyebrow">No hold music. No menu tree.</span>
+        <h1 class="headline">Pick a specialist.<br>Start <span class="accent-gradient">talking</span>.</h1>
+        <p class="sub">Specialized voice AI agents run this line, each one trained for a single job instead of a general script. This is the real pipeline, your mic, live speech-to-text, and a spoken reply back.</p>
+
+        <div class="caller-id">
+          <label for="phoneInput">Caller ID</label>
+          <input id="phoneInput" type="tel" autocomplete="tel" inputmode="tel" placeholder="+91XXXXXXXXXX">
+          <span class="hint2">Used to look up an existing account, if any. Any number works, including a made-up one.</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="roster" aria-label="Choose a specialist to talk to">
+      <article class="agent-card" data-agent="kevin" data-persona="kevin_l1" tabindex="0" role="button" aria-pressed="false">
+        <div class="card-top">
+          <div class="avatar avatar--kevin"><span>K</span></div>
+          <span class="pill pill--online">Online now</span>
+        </div>
+        <h2>Kevin</h2>
+        <p class="role">L1 Technical Support · Network &amp; Air Fiber</p>
+        <p class="pitch">Calm under pressure. Reads your router and L.O.S. light live, tells you what's actually wrong, and gives you a real E.T.A. instead of a script.</p>
+        <div class="tags"><span>Outages</span><span>Slow speeds</span><span>Router resets</span></div>
+        <button class="cta cta--kevin" data-start="kevin_l1" type="button">Start talking to Kevin</button>
+      </article>
+
+      <article class="agent-card" data-agent="jessika" data-persona="jessika_presales" tabindex="0" role="button" aria-pressed="false">
+        <div class="card-top">
+          <div class="avatar avatar--jess"><span>J</span></div>
+          <span class="pill pill--online">Online now</span>
+        </div>
+        <h2>Jessika</h2>
+        <p class="role">Sales Consultant · Veloce Fiber &amp; Mobile SIM</p>
+        <p class="pitch">Runs discovery like a working rep: checks if fiber covers your city, sizes the right plan, and quotes the price with GST built in, no guessing games.</p>
+        <div class="tags"><span>Veloce Fiber</span><span>Mobile SIM</span><span>Vanity numbers</span></div>
+        <button class="cta cta--jess" data-start="jessika_presales" type="button">Start talking to Jessika</button>
+      </article>
+    </section>
+
+    <section class="call-panel" id="callPanel" hidden aria-live="polite">
+      <div id="errorBanner" class="error-banner" hidden></div>
+
+      <div class="call-header">
+        <div class="call-who">
+          <div class="avatar avatar--sm" id="callAvatar"><span id="callInitial">K</span></div>
+          <div>
+            <h3 id="callName">Kevin</h3>
+            <p class="call-status" id="callStatus"><span class="rec-dot"></span><span id="callStatusText">Tap the mic to begin</span></p>
+          </div>
+        </div>
+        <div class="call-meta">
+          <span class="timer" id="callTimer">00:00</span>
+          <button class="end-btn" id="endCall" type="button">End call</button>
+        </div>
+      </div>
+
+      <div class="waveform" id="waveform" aria-hidden="true"></div>
+
+      <div class="transcript" id="transcript"></div>
+
+      <div class="call-controls">
+        <button class="mic-btn" id="micBtn" type="button" aria-label="Tap to talk">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="9" y="2" width="6" height="12" rx="3"></rect>
+            <path d="M5 10a7 7 0 0 0 14 0"></path>
+            <line x1="12" y1="17" x2="12" y2="21"></line>
+            <line x1="8" y1="21" x2="16" y2="21"></line>
+          </svg>
+        </button>
+        <p class="hint" id="micHint">Tap once to start recording, tap again to send.</p>
+      </div>
+
+      <p class="call-footnote">Real call: audio goes to speech-to-text, the persona's live brain, then text-to-speech. Nothing here is scripted.</p>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <p>Running on the NovaConnect Sarvam voice stack · Same brain, same guardrails as the real line.</p>
+  </footer>
+</div>
+
+<audio id="playback" class="sr-only" playsinline></audio>
+
+<script>
+(function(){
+  'use strict';
+  var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  var PERSONAS = {
+    kevin_l1: { name: 'Kevin', initial: 'K', agentKey: 'kevin' },
+    jessika_presales: { name: 'Jessika', initial: 'J', agentKey: 'jessika' }
+  };
+
+  var panel = document.getElementById('callPanel');
+  var transcript = document.getElementById('transcript');
+  var waveform = document.getElementById('waveform');
+  var micBtn = document.getElementById('micBtn');
+  var micHint = document.getElementById('micHint');
+  var callName = document.getElementById('callName');
+  var callInitial = document.getElementById('callInitial');
+  var callStatus = document.getElementById('callStatus');
+  var callStatusText = document.getElementById('callStatusText');
+  var callTimer = document.getElementById('callTimer');
+  var endCallBtn = document.getElementById('endCall');
+  var errorBanner = document.getElementById('errorBanner');
+  var phoneInput = document.getElementById('phoneInput');
+  var playback = document.getElementById('playback');
+  var cards = document.querySelectorAll('.agent-card');
+
+  var BAR_COUNT = 28;
+  for (var i = 0; i < BAR_COUNT; i++) {
+    var bar = document.createElement('span');
+    bar.className = 'bar';
+    bar.style.animationDelay = (i * 0.045) + 's';
+    bar.style.animationDuration = (0.7 + (i % 5) * 0.09) + 's';
+    waveform.appendChild(bar);
+  }
+
+  function randomDemoNumber(){
+    var digits = '';
+    for (var i = 0; i < 10; i++) digits += Math.floor(Math.random() * 10);
+    return '+91' + digits;
+  }
+  phoneInput.value = randomDemoNumber();
+
+  var state = {
+    personaId: null,
+    sessionId: null,
+    timerId: null,
+    elapsed: 0,
+    recorder: null,
+    isRecording: false,
+    isBusy: false
+  };
+
+  function fmtTime(s){
+    var m = Math.floor(s / 60), sec = s % 60;
+    return String(m).padStart(2,'0') + ':' + String(sec).padStart(2,'0');
+  }
+
+  function showError(message){
+    errorBanner.textContent = message;
+    errorBanner.hidden = false;
+  }
+  function clearError(){
+    errorBanner.hidden = true;
+    errorBanner.textContent = '';
+  }
+
+  function appendBubble(role, text){
+    var b = document.createElement('div');
+    b.className = 'bubble bubble--' + role;
+    b.textContent = text;
+    transcript.appendChild(b);
+    b.scrollIntoView({ block: 'nearest', behavior: reduceMotion ? 'auto' : 'smooth' });
+    return b;
+  }
+
+  function setStatus(label){ callStatusText.textContent = label; }
+
+  // ---------------- WAV recorder (Web Audio API, no external deps) ----------------
+  function createRecorder(){
+    var ctx = null, source = null, processor = null, muteGain = null, stream = null;
+    var buffers = [];
+    var sampleRate = 44100;
+
+    async function start(){
+      stream = await navigator.mediaDevices.getUserMedia({
+        audio: { echoCancellation: true, noiseSuppression: true }
+      });
+      ctx = new (window.AudioContext || window.webkitAudioContext)();
+      sampleRate = ctx.sampleRate;
+      source = ctx.createMediaStreamSource(stream);
+      processor = ctx.createScriptProcessor(4096, 1, 1);
+      muteGain = ctx.createGain();
+      muteGain.gain.value = 0;
+      buffers = [];
+      processor.onaudioprocess = function(e){
+        buffers.push(new Float32Array(e.inputBuffer.getChannelData(0)));
+      };
+      source.connect(processor);
+      processor.connect(muteGain);
+      muteGain.connect(ctx.destination);
+    }
+
+    function stop(){
+      if (processor) processor.disconnect();
+      if (source) source.disconnect();
+      if (muteGain) muteGain.disconnect();
+      if (stream) stream.getTracks().forEach(function(t){ t.stop(); });
+      var sampleCount = 0;
+      for (var i = 0; i < buffers.length; i++) sampleCount += buffers[i].length;
+      var durationSeconds = sampleRate ? sampleCount / sampleRate : 0;
+      var blob = encodeWav(buffers, sampleRate);
+      if (ctx) ctx.close();
+      return { blob: blob, durationSeconds: durationSeconds };
+    }
+
+    function encodeWav(chunks, rate){
+      var total = 0;
+      for (var i = 0; i < chunks.length; i++) total += chunks[i].length;
+      var merged = new Float32Array(total);
+      var offset = 0;
+      for (var j = 0; j < chunks.length; j++) { merged.set(chunks[j], offset); offset += chunks[j].length; }
+
+      var pcm = new Int16Array(merged.length);
+      for (var k = 0; k < merged.length; k++) {
+        var s = Math.max(-1, Math.min(1, merged[k]));
+        pcm[k] = s < 0 ? s * 0x8000 : s * 0x7FFF;
+      }
+
+      var buffer = new ArrayBuffer(44 + pcm.length * 2);
+      var view = new DataView(buffer);
+      function writeString(pos, str){ for (var i2 = 0; i2 < str.length; i2++) view.setUint8(pos + i2, str.charCodeAt(i2)); }
+
+      writeString(0, 'RIFF');
+      view.setUint32(4, 36 + pcm.length * 2, true);
+      writeString(8, 'WAVE');
+      writeString(12, 'fmt ');
+      view.setUint32(16, 16, true);
+      view.setUint16(20, 1, true);
+      view.setUint16(22, 1, true);
+      view.setUint32(24, rate, true);
+      view.setUint32(28, rate * 2, true);
+      view.setUint16(32, 2, true);
+      view.setUint16(34, 16, true);
+      writeString(36, 'data');
+      view.setUint32(40, pcm.length * 2, true);
+
+      var idx = 44;
+      for (var m = 0; m < pcm.length; m++, idx += 2) view.setInt16(idx, pcm[m], true);
+
+      return new Blob([view], { type: 'audio/wav' });
+    }
+
+    return { start: start, stop: stop };
+  }
+
+  // ---------------- call lifecycle ----------------
+  function startCall(personaId){
+    var p = PERSONAS[personaId];
+    state.personaId = personaId;
+    state.sessionId = null;
+    state.elapsed = 0;
+    state.isBusy = false;
+    state.isRecording = false;
+    clearError();
+
+    cards.forEach(function(c){
+      var active = c.dataset.persona === personaId;
+      c.classList.toggle('is-active', active);
+      c.setAttribute('aria-pressed', active ? 'true' : 'false');
+    });
+
+    panel.hidden = false;
+    panel.dataset.agent = p.agentKey;
+    callName.textContent = p.name;
+    callInitial.textContent = p.initial;
+    transcript.innerHTML = '';
+    appendBubble('system', 'Call connected with ' + p.name + '.');
+    micBtn.disabled = false;
+    micBtn.classList.remove('is-recording');
+    setStatus('Tap the mic to begin');
+    callTimer.textContent = '00:00';
+
+    panel.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
+
+    clearInterval(state.timerId);
+    state.timerId = setInterval(function(){
+      state.elapsed++;
+      callTimer.textContent = fmtTime(state.elapsed);
+    }, 1000);
+  }
+
+  async function endCall(){
+    if (state.isRecording && state.recorder) {
+      try { state.recorder.stop(); } catch (e) {}
+    }
+    playback.pause();
+    clearInterval(state.timerId);
+    var sid = state.sessionId;
+    panel.hidden = true;
+    waveform.classList.remove('is-speaking', 'is-recording');
+    cards.forEach(function(c){ c.classList.remove('is-active'); c.setAttribute('aria-pressed','false'); });
+    state = { personaId: null, sessionId: null, timerId: null, elapsed: 0, recorder: null, isRecording: false, isBusy: false };
+    if (sid) {
+      try { await fetch('/api/session/' + encodeURIComponent(sid), { method: 'DELETE' }); } catch (e) {}
+    }
+  }
+
+  async function toggleMic(){
+    if (state.isBusy) return;
+
+    if (!state.isRecording) {
+      // -- start recording --
+      clearError();
+      var phone = phoneInput.value.trim();
+      if (!phone) { showError('Enter a caller I.D. number before starting.'); return; }
+
+      state.recorder = createRecorder();
+      try {
+        await state.recorder.start();
+      } catch (err) {
+        showError('Microphone access is needed to talk to ' + PERSONAS[state.personaId].name + '. Please allow access and try again.');
+        return;
+      }
+      state.isRecording = true;
+      micBtn.classList.add('is-recording');
+      waveform.classList.add('is-recording');
+      callStatus.classList.add('is-recording');
+      setStatus('Recording, tap to send');
+      return;
+    }
+
+    // -- stop recording and send --
+    state.isRecording = false;
+    micBtn.classList.remove('is-recording');
+    waveform.classList.remove('is-recording');
+    callStatus.classList.remove('is-recording');
+    var recording = state.recorder.stop();
+
+    if (recording.durationSeconds < 0.3) {
+      showError('That was too short to catch. Hold the mic down a little longer and try again.');
+      setStatus('Tap the mic to begin');
+      return;
+    }
+
+    await sendTurn(recording.blob);
+  }
+
+  async function sendTurn(wavBlob){
+    state.isBusy = true;
+    micBtn.disabled = true;
+    setStatus('Sending...');
+
+    var form = new FormData();
+    form.append('phone_number', phoneInput.value.trim());
+    form.append('persona', state.personaId);
+    if (state.sessionId) form.append('session_id', state.sessionId);
+    form.append('audio', wavBlob, 'turn.wav');
+
+    try {
+      var res = await fetch('/api/process-voice', { method: 'POST', body: form });
+
+      if (!res.ok) {
+        var detail = 'Something went wrong on that turn.';
+        var rawBodyText = '';
+        try {
+          rawBodyText = await res.text();
+          var errJson = JSON.parse(rawBodyText);
+          if (typeof errJson.detail === 'string' && errJson.detail.trim()) {
+            detail = errJson.detail.trim();
+          } else if (Array.isArray(errJson.detail) && errJson.detail.length) {
+            // FastAPI request-validation errors: [{loc, msg, type}, ...]
+            detail = errJson.detail.map(function(d){ return (d && d.msg) ? d.msg : JSON.stringify(d); }).join('; ');
+          } else if (errJson.detail) {
+            detail = String(errJson.detail);
+          }
+        } catch (e) {}
+        if (detail.length > 220) detail = detail.slice(0, 217) + '...';
+        console.error('process-voice failed: HTTP ' + res.status, rawBodyText);
+        showError(detail + ' (HTTP ' + res.status + ')');
+        setStatus('Tap the mic to try again');
+        micBtn.disabled = false;
+        state.isBusy = false;
+        return;
+      }
+
+      var contentType = res.headers.get('Content-Type') || '';
+
+      if (contentType.indexOf('audio/') === 0) {
+        var sessionId = res.headers.get('X-Session-Id');
+        var userText = res.headers.get('X-Transcript');
+        var agentText = res.headers.get('X-Response-Text');
+        if (sessionId) state.sessionId = sessionId;
+        if (userText) appendBubble('user', userText);
+        if (agentText) appendBubble('agent', agentText);
+
+        var blob = await res.blob();
+        var url = URL.createObjectURL(blob);
+        playback.src = url;
+        waveform.classList.add('is-speaking');
+        setStatus('Speaking...');
+        playback.onended = function(){
+          waveform.classList.remove('is-speaking');
+          setStatus('Tap the mic to begin');
+          URL.revokeObjectURL(url);
+        };
+        try { await playback.play(); } catch (e) {
+          waveform.classList.remove('is-speaking');
+          setStatus('Tap the mic to begin');
+        }
+      } else {
+        var payload = await res.json();
+        if (payload.session_id) state.sessionId = payload.session_id;
+        if (payload.transcript) appendBubble('user', payload.transcript);
+        if (payload.response_text) appendBubble('agent', payload.response_text);
+        appendBubble('system', 'Audio unavailable this turn (' + (payload.degraded_reason || 'text only') + ').');
+        setStatus('Tap the mic to begin');
+      }
+    } catch (err) {
+      console.error('process-voice network error:', err);
+      showError('Could not reach the voice line (' + (err && err.message ? err.message : 'network error') + '). Check your connection and try again.');
+      setStatus('Tap the mic to try again');
+    } finally {
+      micBtn.disabled = false;
+      state.isBusy = false;
+    }
+  }
+
+  cards.forEach(function(card){
+    card.addEventListener('click', function(e){
+      if (e.target.closest('.cta')) return;
+      startCall(card.dataset.persona);
+    });
+    card.addEventListener('keydown', function(e){
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); startCall(card.dataset.persona); }
+    });
+  });
+  document.querySelectorAll('[data-start]').forEach(function(btn){
+    btn.addEventListener('click', function(e){
+      e.stopPropagation();
+      startCall(btn.dataset.start);
+    });
+  });
+  micBtn.addEventListener('click', toggleMic);
+  endCallBtn.addEventListener('click', endCall);
+
+  // ---- ambient hero canvas: two drifting signal lines ----
+  try {
+    var canvas = document.getElementById('ambient');
+    var ctx2d = canvas.getContext('2d');
+    var hero = canvas.parentElement;
+    var t = 0;
+
+    function resize(){ canvas.width = hero.clientWidth; canvas.height = hero.clientHeight; }
+    function drawWave(phase, color, amp, yFrac){
+      var w = canvas.width, h = canvas.height;
+      ctx2d.beginPath();
+      for (var x = 0; x <= w; x += 6){
+        var y = h * yFrac + Math.sin((x * 0.012) + phase) * amp;
+        if (x === 0) ctx2d.moveTo(x, y); else ctx2d.lineTo(x, y);
+      }
+      ctx2d.strokeStyle = color;
+      ctx2d.lineWidth = 1.6;
+      ctx2d.stroke();
+    }
+    function frame(){
+      ctx2d.clearRect(0, 0, canvas.width, canvas.height);
+      drawWave(t, 'rgba(53,216,194,0.55)', 18, 0.62);
+      drawWave(t * 1.15 + 2, 'rgba(255,127,92,0.5)', 22, 0.74);
+      t += 0.018;
+      if (!reduceMotion) requestAnimationFrame(frame);
+    }
+    resize();
+    window.addEventListener('resize', resize);
+    frame();
+  } catch (e) { /* ambient canvas is decorative only */ }
+})();
+</script>
+</body>
+</html>
