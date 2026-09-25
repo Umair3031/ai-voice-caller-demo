@@ -36,8 +36,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               nav pill for space; growing it here can't change the pill's
               width since they're independent flex items, not flex-1. */}
           <Link href="/" className="flex shrink-0 items-center gap-2.5">
-            <Image src="/novaconnect-logo.png" alt="NovaConnect" width={48} height={48} className="size-12" priority />
-            <span className="hidden text-xs text-ink-muted sm:inline">Telecoms</span>
+            <Image src="/novaconnect-logo.png" alt="NovaConnect" width={61} height={40} className="h-10 w-auto" priority />
           </Link>
 
           <nav
