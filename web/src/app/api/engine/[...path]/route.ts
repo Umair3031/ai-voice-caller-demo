@@ -20,6 +20,9 @@ import { type NextRequest, NextResponse } from "next/server";
 
 const ENGINE_BASE_URL = process.env.ENGINE_BASE_URL ?? "http://localhost:8000";
 const OPERATOR_API_KEY = process.env.OPERATOR_API_KEY ?? "";
+// This deployment shares its engine with the original client's frontend, so
+// the roster call below is scoped to this brand's agents.
+const PERSONA_BRAND = process.env.PERSONA_BRAND;
 
 /** Paths whose engine routes require `X-API-Key`. */
 const OPERATOR_PREFIXES = ["customers", "telemetry"] as const;
@@ -49,6 +52,14 @@ async function proxy(request: NextRequest, segments: string[]): Promise<NextResp
     ENGINE_BASE_URL,
   );
   target.search = request.nextUrl.search;
+  if (
+    PERSONA_BRAND &&
+    request.method === "GET" &&
+    segments.join("/") === "calls/personas" &&
+    !target.searchParams.has("brand")
+  ) {
+    target.searchParams.set("brand", PERSONA_BRAND);
+  }
 
   const headers = new Headers();
   request.headers.forEach((value, key) => {
