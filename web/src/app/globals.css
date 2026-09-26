@@ -196,12 +196,12 @@
   --agent-accent-soft: var(--agent-default-soft);
   --agent-accent-rgb: var(--agent-default-rgb);
 }
-[data-agent="kevin_l1"] {
+[data-agent="novaconnect_kevin_l1"] {
   --agent-accent: var(--agent-kevin);
   --agent-accent-soft: var(--agent-kevin-soft);
   --agent-accent-rgb: var(--agent-kevin-rgb);
 }
-[data-agent="jessika_presales"] {
+[data-agent="novaconnect_jessika_presales"] {
   --agent-accent: var(--agent-jessika);
   --agent-accent-soft: var(--agent-jessika-soft);
   --agent-accent-rgb: var(--agent-jessika-rgb);
